@@ -88,7 +88,7 @@ def get_corners(img,ct,num_corners,quality,distance):
         cv2.circle(img_copy,(x,y),10,255,-1)
         # print(shi_tomasi_corners.shape) 
     # cv2.imshow('corners',img_copy) 
-    print(img_copy.shape)  
+    # print(img_copy.shape)  
     cv2.putText(img_copy, str(ct), (50,110), cv2.FONT_HERSHEY_SIMPLEX, 5, 255,10)
     # cv2.imshow("corners",img_copy)
     return img_copy,shi_tomasi_corners
@@ -172,13 +172,10 @@ def decode_tag(img):
     tag_id_area = cv2.cvtColor(tag_id_area,cv2.COLOR_BGR2GRAY)
     tag_img = tag_id_area.copy()
     cv2.line(tag_img,(0,50),(100,50),(0,0,255),3,cv2.LINE_AA)
-    # cv2.line(inner_box,(0,50),(200,50),(0,0,255),3,cv2.LINE_AA)
-  
     cv2.line(tag_img,(50,0),(50,100),(0,0,255),3,cv2.LINE_AA)
-    # cv2.line(inner_box,(50,0),(50,200),(0,0,255),3,cv2.LINE_AA)
+
    
     tag_lt = tag_id_area[:50,:50]
-    print(tag_lt.shape)
     tag_rt = tag_id_area[:50,50:]
     tag_lb = tag_id_area[50:,:50]
     tag_rb = tag_id_area[50:,50:]
@@ -187,8 +184,8 @@ def decode_tag(img):
     tag_rt_whites = np.argwhere(tag_rt==255).shape[0]
     tag_rb_whites = np.argwhere(tag_rb==255).shape[0]
     tag_corners = [tag_lt_whites,tag_rt_whites,tag_rb_whites,tag_lb_whites]
-    print(tag_corners)
-    print((np.argwhere(tag_lt==255).shape))
+    # print(tag_corners)
+    # print((np.argwhere(tag_lt==255).shape))
     encoded_values =[]
     for i in range(4):
         if(tag_corners[i]>1800):
@@ -197,11 +194,11 @@ def decode_tag(img):
             encoded_values.append(0)
 
     # clockwise_indices = [[0,0],[1,0],[1,1],[0,1]]
-    print(encoded_values)
+    # print(encoded_values)
     tag_id = 0
     for i in range(4):
         tag_id += 2**i*encoded_values[(i+offset)%4]
-    return color, inner_box,offset,tag_id,tag_img
+    return color, inner_box,tag_id,offset,tag_img
 
 def main(video_path):
     retval = True
@@ -251,7 +248,7 @@ def main(video_path):
         # print("actual H:\n",h_orig)
         warped = warpPerspective(thresh, H)
         cv2.imshow('warped',warped)
-        decoded,inner_tag,offset,tag_id,tag_img = decode_tag(warped)
+        decoded,inner_tag,tag_id,offset,tag_img = decode_tag(warped)
         offset_map = ['lt','rt','rb','lb']
         cv2.putText(inner_tag,offset_map[offset]+",id:"+str(tag_id),(60,60),cv2.FONT_HERSHEY_SIMPLEX, 1, 255,5)
         cv2.imshow('decoded',decoded)

@@ -203,9 +203,26 @@ def warpPerspective(img, H):
     # print(img.shape)
     for a in range(warped.shape[0]):
         for b in range(warped.shape[1]):
-            f = [a,b,1]
-            f = np.reshape(f,(3,1))
-            x, y, z = np.matmul(H_inv,f)
-            # print(x,y,z)
+            hom_coord = [a,b,1]
+            hom_coord = np.reshape(hom_coord,(3,1))
+            x, y, z = np.matmul(H_inv,hom_coord)
             warped[a][b] = img[int(y/z)][int(x/z)]
-    return(warped)
+    return warped
+
+def warp_img_on_tag(template_img,src,H):
+    # src = src1.copy()
+    # print(src.shape)
+    H_inv = np.linalg.inv(H)
+    # src = np.dstack((src,src,src))
+    for a in range(template_img.shape[1]):
+        for b in range(template_img.shape[0]):
+            hom_coord = [a,b,1]
+            hom_coord = np.reshape(hom_coord,(3,1))
+            x, y, z = np.matmul(H_inv,hom_coord)
+            x,y = int(x/z),int(y/z)
+            print(x,y)
+            if(y>0 and y<1080 and x>0 and x<1920):
+                # print("added testudo pixel")
+                src[y,x] = template_img[a][b]
+    return src
+
