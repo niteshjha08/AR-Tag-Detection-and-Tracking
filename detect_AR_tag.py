@@ -204,24 +204,24 @@ def main(video_path):
     retval = True
     cap = cv2.VideoCapture(video_path)
     ct = 0
-    cv2.namedWindow('img_gray',cv2.WINDOW_KEEPRATIO)
+    # cv2.namedWindow('img_gray',cv2.WINDOW_KEEPRATIO)
 
     # cv2.namedWindow('fft',cv2.WINDOW_KEEPRATIO)
     # cv2.namedWindow('thresh',cv2.WINDOW_KEEPRATIO)
     # cv2.namedWindow('corners',cv2.WINDOW_KEEPRATIO)
-    cv2.namedWindow('outer_corners',cv2.WINDOW_KEEPRATIO)
-    cv2.namedWindow('inner_corners',cv2.WINDOW_KEEPRATIO)
+    # cv2.namedWindow('outer_corners',cv2.WINDOW_KEEPRATIO)
+    # cv2.namedWindow('inner_corners',cv2.WINDOW_KEEPRATIO)
     # cv2.namedWindow('all_inner_corners',cv2.WINDOW_KEEPRATIO)
     # cv2.namedWindow('viz_padding',cv2.WINDOW_KEEPRATIO)
-    cv2.namedWindow('warped',cv2.WINDOW_KEEPRATIO)
-    cv2.namedWindow('decoded',cv2.WINDOW_KEEPRATIO)
-    cv2.namedWindow('inner_tag',cv2.WINDOW_KEEPRATIO)
-    cv2.namedWindow('tag',cv2.WINDOW_KEEPRATIO)
+    # cv2.namedWindow('warped',cv2.WINDOW_KEEPRATIO)
+    # cv2.namedWindow('decoded',cv2.WINDOW_KEEPRATIO)
+    # cv2.namedWindow('inner_tag',cv2.WINDOW_KEEPRATIO)
+    # cv2.namedWindow('tag',cv2.WINDOW_KEEPRATIO)
     
     while(True):
         retval, frame = cap.read()            
         img_gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
-        cv2.imshow('img_gray',img_gray)
+        # cv2.imshow('img_gray',img_gray)
         ret,thresh = cv2.threshold(img_gray,150,255,cv2.THRESH_BINARY)
         # cv2.imshow('thresh',thresh)
         img_fft = fast_fourier_transform(thresh)
