@@ -7,7 +7,7 @@ from scipy.fft import fft2, ifft2
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from homography import *
+from utils import *
 from detect_AR_tag import *
 
 
@@ -15,10 +15,8 @@ def get_image(image_path,offset):
     img = cv2.imread(image_path)
     img = cv2.resize(img,(400,400))
     offset = (offset  + 1)%4
-    # mapping = {3:}
-    num_clockwise_rotation = (4 - offset) % 4
-    print("num_clockwise_rot:",num_clockwise_rotation)
-    for i in range(num_clockwise_rotation):
+    num_cclockwise_rotation = (4 - offset) % 4
+    for i in range(num_cclockwise_rotation):
         img = cv2.rotate(img,cv2.ROTATE_90_COUNTERCLOCKWISE)
     return img
 
@@ -44,7 +42,7 @@ def superpose_image(video_path,img_path):
 
     frame_width = int(cap.get(3)) 
     frame_height = int(cap.get(4))
-    vid = cv2.VideoWriter('./Testudo.avi',cv2.VideoWriter_fourcc('M','J','P','G'), fps, (frame_width,frame_height))
+    vid = cv2.VideoWriter('./output/Testudo.avi',cv2.VideoWriter_fourcc('M','J','P','G'), fps, (frame_width,frame_height))
 
     while(True):                 
         retval, frame = cap.read() 
@@ -162,7 +160,7 @@ def place_AR_cube(video_path,K):
 
     frame_width = int(cap.get(3)) 
     frame_height = int(cap.get(4))
-    vid = cv2.VideoWriter('./Cube.avi',cv2.VideoWriter_fourcc('M','J','P','G'), fps, (frame_width,frame_height))
+    vid = cv2.VideoWriter('./output/Cube.avi',cv2.VideoWriter_fourcc('M','J','P','G'), fps, (frame_width,frame_height))
     while(True):   
         print("frame:",ct)               
         retval, frame = cap.read() 
@@ -207,8 +205,8 @@ if __name__=="__main__":
     video_path = './media/1tagvideo.mp4'
     image_path = './media/testudo.png'
     intrinsic_params_path = './param/kmatrix.csv'
-    Superimpose_Testudo = True
-    Place_AR_Cube = False
+    Superimpose_Testudo = False
+    Place_AR_Cube = True
     K = get_camera_matrix(intrinsic_params_path)
     if Superimpose_Testudo:
         superpose_image(video_path,image_path)
