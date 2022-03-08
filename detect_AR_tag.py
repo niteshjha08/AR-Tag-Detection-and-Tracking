@@ -8,6 +8,7 @@ import pandas as pd
 
 from homography import *
 
+
 def fast_fourier_transform(img):
     dft = cv2.dft(np.float32(img), flags=cv2.DFT_COMPLEX_OUTPUT)
     dft_shift = np.fft.fftshift(dft)
@@ -29,11 +30,8 @@ def fast_fourier_transform(img):
     mask[mask_area] = 0
 
     fshift = dft_shift * mask
-
+ 
     fshift_mask_mag = 2000 * np.log(cv2.magnitude(fshift[:, :, 0], fshift[:, :, 1]))
-    # fshift_mask_mag = 2000 * np.log(np.abs(fshift[0,:],fshift[1,:]))
-
-
     f_ishift = np.fft.ifftshift(fshift)
 
     img_back = cv2.idft(f_ishift)
@@ -41,10 +39,10 @@ def fast_fourier_transform(img):
     lower_thresh = np.min(img_back)
     upper_thresh = np.max(img_back)
     img_back = (img_back - lower_thresh)/upper_thresh
+
     return img_back
 
 
-    
 def circular_mask(img):
     img_copy = img.copy()
     img = np.uint8(img *255)
@@ -53,11 +51,7 @@ def circular_mask(img):
     img[0:10,:] = 0
     img[-10:,:] = 0
     mask = np.zeros_like(img,dtype='uint8')
-
-    # cv2.namedWindow('masked_img',cv2.WINDOW_KEEPRATIO) 
-    # cv2.namedWindow('mask_viz',cv2.WINDOW_KEEPRATIO)              
-
-    # ret, img = cv2.threshold(img,100,255,cv2.THRESH_BINARY)
+         
     whites = np.argwhere(img>100)
     whites_x, whites_y = whites[:,0],whites[:,1]
     center = [np.int(np.mean(whites_x)),np.int(np.mean(whites_y))]
@@ -72,9 +66,6 @@ def circular_mask(img):
     mask_3d = np.dstack((mask,mask,mask))
     masked_img = cv2.bitwise_and(color_img,mask_3d)
     masked_copy=masked_img.copy()
-    cv2.circle(masked_copy,(center[1],center[0]),500,255,4)
-    # cv2.imshow('masked_img',masked_img)
-    # cv2.imshow('mask_viz',masked_copy)
 
     return masked_img
 
@@ -82,15 +73,11 @@ def circular_mask(img):
 def get_corners(img,ct,num_corners,quality,distance):
     img_copy = img.copy()
     shi_tomasi_corners = np.int0(cv2.goodFeaturesToTrack(np.float32(img),num_corners,quality,distance))
-    # return corners
+   
     for corners in shi_tomasi_corners:
         x,y = corners.ravel()
         cv2.circle(img_copy,(x,y),10,255,-1)
-        # print(shi_tomasi_corners.shape) 
-    # cv2.imshow('corners',img_copy) 
-    # print(img_copy.shape)  
-    cv2.putText(img_copy, str(ct), (50,110), cv2.FONT_HERSHEY_SIMPLEX, 5, 255,10)
-    # cv2.imshow("corners",img_copy)
+
     return img_copy,shi_tomasi_corners
 
 def find_extreme_values(corners, masked_img):
@@ -107,8 +94,6 @@ def find_extreme_values(corners, masked_img):
     cv2.circle(img, pt3,5,(255,0,255),-1)
     cv2.circle(img, pt4,5,(255,255,0),-1)
 
-    # cv2.namedWindow('end_corners',cv2.WINDOW_KEEPRATIO) 
-    # cv2.imshow('end_corners',img)
     return img,pt1,pt2,pt3,pt4
 
 
@@ -124,39 +109,31 @@ def remove_outer_edges(masked_img,pt1,pt2,pt3,pt4):
     img = masked_img.copy()
     img_1 = masked_img.copy()
 
-    cv2.polylines(img,[pts],True,(0,0,255),80)
+    cv2.polylines(img,[pts],True,(0,0,0),80)
     cv2.polylines(img_1,[pts],True,(0,0,0),80)
     cv2.polylines(img_1,[pts_o],True,(0,0,0),outer_padding+50)
 
-
-    # cv2.namedWindow('inner_img',cv2.WINDOW_KEEPRATIO)
-    # cv2.imshow('inner_img',img)
     return img,img_1
 
-# def get_homography(pt1,pt2,pt3,pt4):
-#     intrinsic_params_path = r"./param/kmatrix.csv"
-#     Kmatrix = np.array(pd.read_csv(intrinsic_params_path))
-#     # pt1_world = np.linalg.inv(Kmatrix)
-#     print(type(Kmatrix))
 def decode_tag(img):
     color = np.dstack((img,img,img))
     color_copy = color.copy()
-    # cv2.line(color,(200,0),(200,400),(0,0,255),3,cv2.LINE_AA)
-    # cv2.line(color,(100,0),(100,400),(0,0,255),3,cv2.LINE_AA)
-    # cv2.line(color,(300,0),(300,400),(0,0,255),3,cv2.LINE_AA)
+    cv2.line(color,(200,0),(200,400),(0,0,255),3,cv2.LINE_AA)
+    cv2.line(color,(100,0),(100,400),(0,0,255),3,cv2.LINE_AA)
+    cv2.line(color,(300,0),(300,400),(0,0,255),3,cv2.LINE_AA)
 
-    # cv2.line(color,(0,200),(400,200),(0,0,255),3,cv2.LINE_AA)
-    # cv2.line(color,(0,100),(400,100),(0,0,255),3,cv2.LINE_AA)
-    # cv2.line(color,(0,300),(400,300),(0,0,255),3,cv2.LINE_AA)
+    cv2.line(color,(0,200),(400,200),(0,0,255),3,cv2.LINE_AA)
+    cv2.line(color,(0,100),(400,100),(0,0,255),3,cv2.LINE_AA)
+    cv2.line(color,(0,300),(400,300),(0,0,255),3,cv2.LINE_AA)
 
     inner_box = color_copy[100:300,100:300]
-    # cv2.line(inner_box,(0,100),(200,100),(0,0,255),3,cv2.LINE_AA)
-    # cv2.line(inner_box,(0,50),(200,50),(0,0,255),3,cv2.LINE_AA)
-    # cv2.line(inner_box,(0,150),(200,150),(0,0,255),3,cv2.LINE_AA)
+    cv2.line(inner_box,(0,100),(200,100),(0,0,255),3,cv2.LINE_AA)
+    cv2.line(inner_box,(0,50),(200,50),(0,0,255),3,cv2.LINE_AA)
+    cv2.line(inner_box,(0,150),(200,150),(0,0,255),3,cv2.LINE_AA)
 
-    # cv2.line(inner_box,(100,0),(100,200),(0,0,255),3,cv2.LINE_AA)
-    # cv2.line(inner_box,(50,0),(50,200),(0,0,255),3,cv2.LINE_AA)
-    # cv2.line(inner_box,(150,0),(150,200),(0,0,255),3,cv2.LINE_AA)
+    cv2.line(inner_box,(100,0),(100,200),(0,0,255),3,cv2.LINE_AA)
+    cv2.line(inner_box,(50,0),(50,200),(0,0,255),3,cv2.LINE_AA)
+    cv2.line(inner_box,(150,0),(150,200),(0,0,255),3,cv2.LINE_AA)
     lt_corner = inner_box[:50,:50]
     lb_corner = inner_box[150:,:50]
     rt_corner = inner_box[:50,150:]
@@ -165,15 +142,13 @@ def decode_tag(img):
     lb_whites = np.argwhere(lb_corner==(255,255,255)).shape[0]
     rt_whites = np.argwhere(rt_corner==(255,255,255)).shape[0]
     rb_whites = np.argwhere(rb_corner==(255,255,255)).shape[0]
+
     vals = np.array([lt_whites,rt_whites,rb_whites,lb_whites])
     offset = np.argmax(vals) # clockwise rotation offset starting from left top
 
     tag_id_area = inner_box[50:150,50:150]
     tag_id_area = cv2.cvtColor(tag_id_area,cv2.COLOR_BGR2GRAY)
     tag_img = tag_id_area.copy()
-    cv2.line(tag_img,(0,50),(100,50),(0,0,255),3,cv2.LINE_AA)
-    cv2.line(tag_img,(50,0),(50,100),(0,0,255),3,cv2.LINE_AA)
-
    
     tag_lt = tag_id_area[:50,:50]
     tag_rt = tag_id_area[:50,50:]
@@ -184,8 +159,7 @@ def decode_tag(img):
     tag_rt_whites = np.argwhere(tag_rt==255).shape[0]
     tag_rb_whites = np.argwhere(tag_rb==255).shape[0]
     tag_corners = [tag_lt_whites,tag_rt_whites,tag_rb_whites,tag_lb_whites]
-    # print(tag_corners)
-    # print((np.argwhere(tag_lt==255).shape))
+
     encoded_values =[]
     for i in range(4):
         if(tag_corners[i]>1800):
@@ -193,77 +167,59 @@ def decode_tag(img):
         else:
             encoded_values.append(0)
 
-    # clockwise_indices = [[0,0],[1,0],[1,1],[0,1]]
-    # print(encoded_values)
     tag_id = 0
     for i in range(4):
         tag_id += 2**i*encoded_values[(i+offset)%4]
+    
     return color, inner_box,tag_id,offset,tag_img
 
 def main(video_path):
     retval = True
     cap = cv2.VideoCapture(video_path)
-    ct = 0
-    # cv2.namedWindow('img_gray',cv2.WINDOW_KEEPRATIO)
 
-    # cv2.namedWindow('fft',cv2.WINDOW_KEEPRATIO)
-    # cv2.namedWindow('thresh',cv2.WINDOW_KEEPRATIO)
-    # cv2.namedWindow('corners',cv2.WINDOW_KEEPRATIO)
-    # cv2.namedWindow('outer_corners',cv2.WINDOW_KEEPRATIO)
-    # cv2.namedWindow('inner_corners',cv2.WINDOW_KEEPRATIO)
-    # cv2.namedWindow('all_inner_corners',cv2.WINDOW_KEEPRATIO)
-    # cv2.namedWindow('viz_padding',cv2.WINDOW_KEEPRATIO)
-    # cv2.namedWindow('warped',cv2.WINDOW_KEEPRATIO)
-    # cv2.namedWindow('decoded',cv2.WINDOW_KEEPRATIO)
-    # cv2.namedWindow('inner_tag',cv2.WINDOW_KEEPRATIO)
-    # cv2.namedWindow('tag',cv2.WINDOW_KEEPRATIO)
     
     while(True):
-        retval, frame = cap.read()            
+        retval, frame = cap.read()   
+
+        if(not retval):
+            print("Video Completed.")
+            break  
+
         img_gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
-        # cv2.imshow('img_gray',img_gray)
+     
         ret,thresh = cv2.threshold(img_gray,150,255,cv2.THRESH_BINARY)
-        # cv2.imshow('thresh',thresh)
+ 
         img_fft = fast_fourier_transform(thresh)
-        # cv2.imshow('fft',img_fft)
 
         masked_img = circular_mask(img_fft)
         
         masked_gray = cv2.cvtColor(masked_img,cv2.COLOR_BGR2GRAY)
-        all_corner_img,corners = get_corners(masked_gray,ct,25,0.01,70)
+        all_corner_img,corners = get_corners(masked_gray,-1,25,0.01,70)
+    
         outer_corners_img,pt1,pt2,pt3,pt4 = find_extreme_values(corners, masked_img)
-        cv2.imshow('outer_corners',outer_corners_img)
-        # print("homography matrix:",H)
+
         inner_img,inner_img_1 = remove_outer_edges(masked_img,pt1,pt2,pt3,pt4)
+
         inner_gray = cv2.cvtColor(inner_img_1,cv2.COLOR_BGR2GRAY)
-        all_inner_corners,corners = get_corners(inner_gray,ct,50,0.00001,1)
-        # cv2.imshow('all_inner_corners',all_inner_corners)
-        # cv2.imshow('viz_padding',inner_img_1)
+        all_inner_corners,corners = get_corners(inner_gray,-1,50,0.00001,1)
         inner_corners_img,ipt1,ipt2,ipt3,ipt4 = find_extreme_values(corners, inner_img_1)
-        cv2.imshow('inner_corners',inner_corners_img)
         corners = np.array([ipt2,ipt3,ipt4,ipt1])
+        
         H = final_homography_matrix(corners)
-        # print("my H:\n",H)
-        # h_orig = cv2.getPerspectiveTransform(np.array([ipt2,ipt3,ipt4,ipt1],dtype=np.float32),np.array([[0,0],[400,0],[400,800],[0,800]],dtype=np.float32))
-        # print("actual H:\n",h_orig)
+
         warped = warpPerspective(thresh, H)
-        cv2.imshow('warped',warped)
+
         decoded,inner_tag,tag_id,offset,tag_img = decode_tag(warped)
         offset_map = ['lt','rt','rb','lb']
-        cv2.putText(inner_tag,offset_map[offset]+",id:"+str(tag_id),(60,60),cv2.FONT_HERSHEY_SIMPLEX, 1, 255,5)
-        cv2.imshow('decoded',decoded)
-        cv2.imshow('inner_tag',inner_tag)
+        # cv2.putText(inner_tag,offset_map[offset]+",id:"+str(tag_id),(60,60),cv2.FONT_HERSHEY_SIMPLEX, 1, 255,5)
         cv2.imshow('tag',tag_img)
+        print("tag_id:",tag_id)
+        cv2.waitKey(1)
 
 
-        cv2.waitKey(0)
-        break       
-
-        ct+=1
-        
 
 if __name__=="__main__":
     video_path = './media/1tagvideo.mp4'
     main(video_path)
-    # H = get_homography_matrix
+
     
