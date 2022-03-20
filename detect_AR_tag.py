@@ -214,10 +214,10 @@ def main(video_path):
         # cv2.putText(inner_tag,offset_map[offset]+",id:"+str(tag_id),(60,60),cv2.FONT_HERSHEY_SIMPLEX, 1, 255,5)
         cv2.imshow('tag',tag_img)
         print("tag_id:",tag_id)
+        cv2.putText(frame,"Tag ID: " + str(tag_id),(80,80),cv2.FONT_HERSHEY_SIMPLEX, 3, (0,255,255),5)
+        cv2.imshow('final_frame',frame)
         cv2.waitKey(1)
-
-
-
+       
 if __name__=="__main__":
     video_path = './media/1tagvideo.mp4'
     main(video_path)
