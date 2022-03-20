@@ -30,7 +30,7 @@
 
 ### Superposing an image onto the tag
 <p float="left">
-	<img src="https://github.com/niteshjha08/AR-Tag-Detection-and-Tracking/blob/main/media/img/testudo.gif" width="500" align="centered" />
+	<img src="https://github.com/niteshjha08/AR-Tag-Detection-and-Tracking/blob/main/media/img/testudo.gif" width="500" align="center" />
 </p>
 
 ### Projecting an AR cube onto the tag
